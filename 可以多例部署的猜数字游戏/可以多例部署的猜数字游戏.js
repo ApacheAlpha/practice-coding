@@ -42,7 +42,7 @@ async function main(){
     const data = await test()  //获取异步方法里面的数据
     routers.get('/:number', (ctx, next) => {
         //从ctx中读取get传值
-        num1 = ctx.params['number']
+        let num1 = ctx.params['number']
         if (data > Number(num1)) {
             ctx.body = 'bigger'
         }
