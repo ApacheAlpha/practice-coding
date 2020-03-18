@@ -18,7 +18,7 @@ routers.get('/start', (ctx, next) => {
     ctx.body = 'OK'
 })
 
-//获取num,目前只会这种写法
+//无论是否start都能获取num的值
 function test() {
     return new Promise((resolve, reject) => {
         client.get('num', (err, data) => {
@@ -28,8 +28,8 @@ function test() {
 }
 
 routers.get('/:number', async (ctx, next) => {
-    //获取num的值
-    let data = await test()
+    const data = await test()
+    //从ctx中读取get传值
     let num1 = ctx.params['number']
     if (data > Number(num1)) {
         ctx.body = 'smaller'
@@ -43,4 +43,4 @@ routers.get('/:number', async (ctx, next) => {
 koans.use(cors())
 koans.use(routers.routes())//作用：启动路由
 koans.use(routers.allowedMethods())
-koans.listen(3001)
+koans.listen(3000)
