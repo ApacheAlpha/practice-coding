@@ -34,12 +34,12 @@ function getnum() {
 }
 
 routers.get('/:number', async (ctx) => {
-	const GetNum = Number(ctx.params.number)
+	const number = Number(ctx.params.number)
 	// 用data接收await getnum()的值，减少await getnum()调用
 	const data = await getnum()
-	if (data > GetNum) {
+	if (data > number) {
 		ctx.body = 'smaller'
-	} else if (data < GetNum) {
+	} else if (data < number) {
 		ctx.body = 'bigger'
 	} else {
 		ctx.body = 'equal'
