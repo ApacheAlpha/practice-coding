@@ -14,8 +14,8 @@ const routers = new Router()
 const client = redis.createClient(6379, '127.0.0.1')
 
 routers.get('/start', (ctx) => {
-	// 每次start开始就重置并保存num的进入redis
 	const num = _.random(0, 100)
+	// 每次start开始就重置并保存num的进入redis
 	client.set('num', num)
 	ctx.body = 'OK'
 })
@@ -24,17 +24,22 @@ routers.get('/start', (ctx) => {
 function getnum() {
 	return new Promise((resolve, reject) => {
 		client.get('num', (err, data) => {
-			resolve(data)
-			reject(err)
+			if (err) {
+				reject(err)
+			} else {
+				resolve(data)
+			}
 		})
 	})
 }
 
 routers.get('/:number', async (ctx) => {
-	const num1 = ctx.params.number
-	if (await getnum() > Number(num1)) {
+	const GetNum = Number(ctx.params.number)
+	// 用data接收await getnum()的值，减少await getnum()调用
+	const data = await getnum()
+	if (data > GetNum) {
 		ctx.body = 'smaller'
-	} else if (await getnum() < Number(num1)) {
+	} else if (data < GetNum) {
 		ctx.body = 'bigger'
 	} else {
 		ctx.body = 'equal'

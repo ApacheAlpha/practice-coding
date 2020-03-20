@@ -2,7 +2,7 @@
   "name": "keshihuacsz",
   "version": "1.0.0",
   "description": "",
-  "main": "test1.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,10 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "redis": "^3.0.2",
-    "xmlhttprequest": "^1.8.0"
-  },
-  "devDependencies": {
-    "koa-cors": "0.0.16"
+    "koa": "^2.11.0",
+    "koa-cors": "0.0.16",
+    "koa-router": "^8.0.8",
+    "redis": "^3.0.2"
   }
 }
