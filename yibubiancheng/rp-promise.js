@@ -22,7 +22,7 @@ function start() {
 		})
 }
 
-function test(data) {
+function comparenumbers(data) {
 	const urls = `http://127.0.0.1:3000/${data}`
 	const options1 = {
 		method: 'GET',
@@ -36,10 +36,10 @@ function test(data) {
 					nums = _.ceil((data + 100) / 2)
 					min = data
 					max = nums
-					test(max)
+					comparenumbers(max)
 				} else if (response.body === 'bigger') {
 					max = _.ceil((min + max) / 2)
-					test(max)
+					comparenumbers(max)
 				} else if (response.body === 'equal') {
 					console.log(data)
 				}
@@ -51,6 +51,6 @@ function test(data) {
 function main() {
 	start()
 	num = _.random(0, 1000000)
-	test(num)
+	comparenumbers(num)
 }
 main()
