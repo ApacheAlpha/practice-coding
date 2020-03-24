@@ -1,8 +1,6 @@
 const rp = require('request-promise')
 const _ = require('lodash')
 
-let MIN = 0
-let MAX = 1000000
 function start() {
 	const options = {
 		method: 'GET',
@@ -14,7 +12,7 @@ function start() {
 		})
 }
 
-function comparenumbers(data) {
+function comparenumbers(data, min, max) {
 	const options1 = {
 		method: 'GET',
 		url: `http://127.0.0.1:3000/${data}`,
@@ -22,23 +20,23 @@ function comparenumbers(data) {
 	rp(options1)
 		.then((response) => {
 			if (response === 'smaller') {
-				const nums = _.ceil((data + 1000000) / 2)
-				MIN = data
-				MAX = nums
-				comparenumbers(MAX)
-			} else if (response === 'bigger') {
-				MAX = _.ceil((MIN + MAX) / 2)
-				comparenumbers(MAX)
-			} else if (response === 'equal') {
+				const nums = _.ceil((data + max) / 2)
+				return comparenumbers(nums, data, max)
+			} if (response === 'bigger') {
+				const nums = _.ceil((data + min) / 2)
+				return comparenumbers(nums, min, data)
+			} if (response === 'equal') {
 				console.log(data)
 			}
 		})
 }
 
 function main() {
+	const MIN = 0
+	const MAX = 1000000
 	start()
-	const num = _.random(0, 1000000)
-	comparenumbers(num)
+	const num = _.random(0, MAX)
+	comparenumbers(num, MIN, MAX)
 }
 try {
 	main()

@@ -1,8 +1,6 @@
 const request = require('request')
 const _ = require('lodash')
 
-let MIN = 0
-let MAX = 1000000
 function start(callback) {
 	request.get('http://localhost:3000/start',
 		(err, response, body) => {
@@ -11,32 +9,37 @@ function start(callback) {
 			}
 			if (!err && response.statusCode === 200) {
 				console.log(body)
+				callback
 			}
 		})
 }
 
-function comparenumbers(datas, callback) {
-	request.get(`http://localhost:3000/${datas}`,
+function comparenumbers(data, min, max, callback) {
+	request.get(`http://localhost:3000/${data}`,
 		(err, response, body) => {
 			if (err) {
 				callback(err)
 			}
 			if (!err && response.statusCode === 200) {
 				if (body === 'smaller') {
-					const nums = _.ceil((datas + 100) / 2)
-					MIN = datas
-					MAX = nums
-					comparenumbers(MAX)
+					const nums = _.ceil((data + max) / 2)
+					comparenumbers(nums, data, max)
+					callback
 				} else if (body === 'bigger') {
-					MAX = _.ceil((MIN + MAX) / 2)
-					comparenumbers(MAX)
+					const nums = _.ceil((data + min) / 2)
+					comparenumbers(nums, min, data)
+					callback
 				} else if (body === 'equal') {
-					console.log(datas)
+					console.log(data)
+					callback
 				}
+				callback
 			}
 		})
 }
 
-const num = _.random(0, 100)
+const MIN = 0
+const MAX = 1000000
+const num = _.random(0, MAX)
 start()
-comparenumbers(num)
+comparenumbers(num, MIN, MAX)
