@@ -1,56 +1,47 @@
-const request = require('request')
+const rp = require('request-promise')
 const _ = require('lodash')
 
-let num
-let nums
-let min = 0
-let max = 1000000
-
+let MIN = 0
+let MAX = 1000000
 function start() {
-	return new Promise((resolve, reject) => {
-		request.get('http://127.0.0.1:3000/start',
-			(err, response, body) => {
-				if (err) {
-					reject(err)
-				}
-				if (!err && response.statusCode === 200) {
-					resolve(body)
-				}
-			})
-	})
+	const options = {
+		method: 'GET',
+		url: 'http://127.0.0.1:3000/start',
+	}
+	rp(options)
+		.then((response) => {
+			console.log(response)
+		})
 }
 
 function comparenumbers(data) {
-	return new Promise((resolve, reject) => {
-		request.get(`http://localhost:3000/${data}`,
-			(err, response, body) => {
-				if (err) {
-					reject(err)
-				}
-				if (!err && response.statusCode === 200) {
-					if (body === 'smaller') {
-						nums = _.ceil((data + 100) / 2)
-						min = data
-						max = nums
-						comparenumbers(max)
-					} else if (body === 'bigger') {
-						max = _.ceil((min + max) / 2)
-						comparenumbers(max)
-					} else if (body === 'equal') {
-						resolve(data)
-					}
-				}
-			})
-	})
+	const options1 = {
+		method: 'GET',
+		url: `http://127.0.0.1:3000/${data}`,
+	}
+	rp(options1)
+		.then((response) => {
+			if (response === 'smaller') {
+				const nums = _.ceil((data + 1000000) / 2)
+				MIN = data
+				MAX = nums
+				comparenumbers(MAX)
+			} else if (response === 'bigger') {
+				MAX = _.ceil((MIN + MAX) / 2)
+				comparenumbers(MAX)
+			} else if (response === 'equal') {
+				console.log(data)
+			}
+		})
 }
 
 function main() {
-	num = _.random(0, max)
-	start().then((data) => {
-		console.log(data)
-	})
-	comparenumbers(num).then((result) => {
-		console.log(result)
-	})
+	start()
+	const num = _.random(0, 1000000)
+	comparenumbers(num)
 }
-main()
+try {
+	main()
+} catch (e) {
+	console.log(e)
+}
