@@ -1,26 +1,30 @@
 const should = require('should')
 const _ = require('lodash')
 const test = require('./apiis')
+const req = require('request')
 const request = require('supertest')(test)
 
-describe('GET /register', () => {
-	const arrs = ['数据插入成功', '名字已经存在']
-	it('数据插入成功 or 名字已经存在 ', (done) => {
-		request
-			.get('/register?name=ree454cd&password=23423')
-			.end((err, res) => {
-				arrs.should.containEql(res.text)
-				done()
-			})
-	})
-})
+let header
+
+// describe('GET /register', () => {
+// 	const arrs = ['数据插入成功', '名字已经存在']
+// 	it('数据插入成功 or 名字已经存在 ', (done) => {
+// 		request
+// 			.get('/register?name=r777754cd&password=909090')
+// 			.end((err, res) => {
+// 				arrs.should.containEql(res.text)
+// 				done()
+// 			})
+// 	})
+// })
 
 describe('GET /login', () => {
 	it('respond Hello XXX', (done) => {
 		request
-			.get('/login?name=ree454cd&password=e6f2747d3e12c6c5094870b56211276d')
+			.get('/login?name=r777754cd&password=1e96c0d8d4b4bcb50ecccaeffe85ffd5')
 			.end((err, res) => {
-				res.text.should.equal('Hello ree454cd')
+				header = res.header
+				res.text.should.equal('Hello r777754cd')
 				done()
 			})
 	})
@@ -31,8 +35,9 @@ describe('GET /start', () => {
 	it('start接口测试 ', (done) => {
 		request
 			.get('/start')
+			.set('Cookie', [header['set-cookie'][0].split(';')[0]])
 			.end((err, res) => {
-				console.log(res)
+				console.log(res.text)
 				arrs.should.containEql(res.text)
 				done()
 			})
@@ -44,7 +49,9 @@ describe('GET /number', () => {
 	it('返回 big smell euqal ', (done) => {
 		request
 			.get('/30')
+			.set('Cookie', [header['set-cookie'][0].split(';')[0]])
 			.end((err, res) => {
+				console.log(res.text)
 				arrs.should.containEql(res.text)
 				done()
 			})
