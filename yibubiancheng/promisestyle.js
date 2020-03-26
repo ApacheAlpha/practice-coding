@@ -12,7 +12,7 @@ function start() {
 		})
 }
 
-function comparenumbers(data, min, max) {
+function CompareNumbers(data, min, max) {
 	const options1 = {
 		method: 'GET',
 		url: `http://127.0.0.1:3000/${data}`,
@@ -21,25 +21,21 @@ function comparenumbers(data, min, max) {
 		.then((response) => {
 			if (response === 'smaller') {
 				const nums = _.ceil((data + max) / 2)
-				return comparenumbers(nums, data, max)
+				return CompareNumbers(nums, data, max)
 			} if (response === 'bigger') {
 				const nums = _.ceil((data + min) / 2)
-				return comparenumbers(nums, min, data)
+				return CompareNumbers(nums, min, data)
 			} if (response === 'equal') {
-				console.log(data)
+				return data
 			}
+		})
+		.catch((error) => {
+			throw error
 		})
 }
 
-function main() {
-	const MIN = 0
-	const MAX = 1000000
-	start()
-	const num = _.random(0, MAX)
-	comparenumbers(num, MIN, MAX)
-}
-try {
-	main()
-} catch (e) {
-	console.log(e)
-}
+const MIN = 0
+const MAX = 1000000
+const num = _.random(0, MAX)
+start()
+CompareNumbers(num, MIN, MAX)

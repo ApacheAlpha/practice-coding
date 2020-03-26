@@ -11,7 +11,7 @@ async function start() {
 	console.log(body)
 }
 
-async function comparenumbers(data, min, max) {
+async function CompareNumbers(data, min, max) {
 	const options = {
 		method: 'GET',
 		url: `http://127.0.0.1:3000/${data}`,
@@ -19,21 +19,24 @@ async function comparenumbers(data, min, max) {
 	const body = await rp(options)
 	if (body === 'smaller') {
 		const nums = _.ceil((data + max) / 2)
-		comparenumbers(nums, data, max)
-	} else if (body === 'bigger') {
+		return await CompareNumbers(nums, data, max)
+	} if (body === 'bigger') {
 		const nums = _.ceil((data + min) / 2)
-		comparenumbers(nums, min, data)
-	} else if (body === 'equal') {
-		console.log(data)
+		return await CompareNumbers(nums, min, data)
+	} if (body === 'equal') {
+		return data
 	}
 }
 
-try {
-	const MIN = 0
-	const MAX = 1000000
-	const num = _.random(0, MAX)
-	start()
-	comparenumbers(num, MIN, MAX)
-} catch (e) {
-	console.log(e)
-}
+(async () => {
+	try {
+		const MIN = 0
+		const MAX = 1000000
+		const num = _.random(0, MAX)
+		await start()
+		const data = await CompareNumbers(num, MIN, MAX)
+		console.log(data)
+	} catch (e) {
+		console.log(e)
+	}
+})()

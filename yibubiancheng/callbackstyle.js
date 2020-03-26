@@ -8,13 +8,12 @@ function start(callback) {
 				callback(err)
 			}
 			if (!err && response.statusCode === 200) {
-				console.log(body)
-				callback
+				callback(null, body)
 			}
 		})
 }
 
-function comparenumbers(data, min, max, callback) {
+function CompareNumbers(data, min, max, callback) {
 	request.get(`http://localhost:3000/${data}`,
 		(err, response, body) => {
 			if (err) {
@@ -23,23 +22,27 @@ function comparenumbers(data, min, max, callback) {
 			if (!err && response.statusCode === 200) {
 				if (body === 'smaller') {
 					const nums = _.ceil((data + max) / 2)
-					comparenumbers(nums, data, max)
-					callback
+					CompareNumbers(nums, data, max, callback)
+					callback(null, data)
 				} else if (body === 'bigger') {
 					const nums = _.ceil((data + min) / 2)
-					comparenumbers(nums, min, data)
-					callback
+					CompareNumbers(nums, min, data, callback)
+					callback(null, data)
 				} else if (body === 'equal') {
-					console.log(data)
-					callback
+					callback(null, data)
 				}
-				callback
+				callback(null, data)
 			}
 		})
+}
+
+function main(err, data) {
+	console.log(data)
+	return data
 }
 
 const MIN = 0
 const MAX = 1000000
 const num = _.random(0, MAX)
-start()
-comparenumbers(num, MIN, MAX)
+start(main)
+CompareNumbers(num, MIN, MAX, main)
