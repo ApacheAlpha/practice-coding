@@ -6,36 +6,43 @@ function start() {
 		method: 'GET',
 		url: 'http://127.0.0.1:3000/start',
 	}
-	rp(options)
+	return rp(options)
 		.then((response) => {
 			console.log(response)
 		})
 }
 
-function CompareNumbers(data, min, max) {
+function compareNumbers(data, min, max) {
 	const options1 = {
 		method: 'GET',
 		url: `http://127.0.0.1:3000/${data}`,
 	}
-	rp(options1)
+	return rp(options1)
 		.then((response) => {
 			if (response === 'smaller') {
 				const nums = _.ceil((data + max) / 2)
-				return CompareNumbers(nums, data, max)
+				return compareNumbers(nums, data, max)
 			} if (response === 'bigger') {
 				const nums = _.ceil((data + min) / 2)
-				return CompareNumbers(nums, min, data)
+				return compareNumbers(nums, min, data)
 			} if (response === 'equal') {
 				return data
 			}
 		})
-		.catch((error) => {
-			throw error
-		})
 }
 
-const MIN = 0
-const MAX = 1000000
-const num = _.random(0, MAX)
-start()
-CompareNumbers(num, MIN, MAX)
+
+function main() {
+	const MIN = 0
+	const MAX = 1000000
+	const num = _.random(0, MAX)
+	// 串行执行
+	start().then(() => {
+		compareNumbers(num, MIN, MAX).then((data) => {
+			console.log(data)
+		}).catch((error) => {
+			console.log(error)
+		})
+	})
+}
+main()
