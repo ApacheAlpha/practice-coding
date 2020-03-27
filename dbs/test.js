@@ -1,6 +1,6 @@
 const should = require('should')
 const _ = require('lodash')
-const test = require('./apiis')
+const test = require('./apis')
 const req = require('request')
 const request = require('supertest')(test)
 
