@@ -6,19 +6,15 @@ const csz = require('./index')
 const request = requests(csz)
 
 describe('GET /start', () => {
-	it('respond OK', () => {
+	it('respond OK', (done) => {
 		request
 			.get('/start')
 			.end((err, res) => {
-				if (err) {
-					console.log(err)
-				} else {
-					res.text.should.equal('OK')
-				}
+				res.text.should.equal('OK')
+				done(err)
 			})
 	})
 })
-
 
 describe('GET /number', () => {
 	const num = _.random(0, 100)
@@ -27,12 +23,8 @@ describe('GET /number', () => {
 		request
 			.get(`/${Number(num)}`)
 			.end((err, res) => {
-				if (err) {
-					console.log(err)
-				} else {
-					arrs.should.containEql(res.text)
-				}
+				arrs.should.containEql(res.text)
+				done(err)
 			})
-		done()
 	})
 })

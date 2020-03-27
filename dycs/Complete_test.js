@@ -2,10 +2,11 @@ const _ = require('lodash')
 const req = require('request')
 
 function start() {
-	return new Promise(() => {
+	return new Promise((resolve) => {
 		req.get('http://127.0.0.1:3001/start', (err, response, body) => {
 			if (!err && response.statusCode === 200) {
 				body.should.eql('OK')
+				resolve(body)
 			}
 		})
 	})
@@ -30,17 +31,30 @@ function compareNumbers(data, min, max) {
 	})
 }
 
+// 第一种写法
 describe('GET /number', () => {
-	it('should equal ', (done) => {
+	it('should equal ', () => {
 		const MIN = 0
 		const MAX = 100000
 		const num = _.random(0, MAX)
 		start().then(() => {
-			compareNumbers(num, MIN, MAX)
-				.then((data) => {
-					data.should.equal('equal')
-				})
+			return compareNumbers(num, MIN, MAX).then((data) => {
+				data.should.equal('equal')
+			})
 		})
-		done()
+	})
+})
+
+
+// 第二种写法
+describe('GET /number', () => {
+	it('should equal ', () => {
+		const MIN = 0
+		const MAX = 100000
+		const num = _.random(0, MAX)
+		start().then(async () => {
+			const data = await compareNumbers(num, MIN, MAX)
+			data.should.equal('equal')
+		})
 	})
 })
