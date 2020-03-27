@@ -6,17 +6,17 @@ const request = require('supertest')(test)
 
 let header
 
-// describe('GET /register', () => {
-// 	const arrs = ['数据插入成功', '名字已经存在']
-// 	it('数据插入成功 or 名字已经存在 ', (done) => {
-// 		request
-// 			.get('/register?name=r777754cd&password=909090')
-// 			.end((err, res) => {
-// 				arrs.should.containEql(res.text)
-// 				done()
-// 			})
-// 	})
-// })
+describe('GET /register', () => {
+	const arrs = ['数据插入成功', '名字已经存在']
+	it('数据插入成功 or 名字已经存在 ', (done) => {
+		request
+			.get('/register?name=r777754cd&password=909090')
+			.end((err, res) => {
+				arrs.should.containEql(res.text)
+				done()
+			})
+	})
+})
 
 describe('GET /login', () => {
 	it('respond Hello XXX', (done) => {
