@@ -1,11 +1,15 @@
 const _ = require('lodash')
 const req = require('request')
 
-req.get('http://127.0.0.1:3001/start', (err, response, body) => {
-	if (!err && response.statusCode === 200) {
-		body.should.eql('OK')
-	}
-})
+function start() {
+	return new Promise(() => {
+		req.get('http://127.0.0.1:3001/start', (err, response, body) => {
+			if (!err && response.statusCode === 200) {
+				body.should.eql('OK')
+			}
+		})
+	})
+}
 
 
 function compareNumbers(data, min, max) {
@@ -27,17 +31,15 @@ function compareNumbers(data, min, max) {
 }
 
 describe('GET /number', () => {
-	it('should equal "equal"', (done) => {
+	it('should equal ', () => {
 		const MIN = 0
 		const MAX = 100000
 		const num = _.random(0, MAX)
-		compareNumbers(num, MIN, MAX)
-			.then((data) => {
-				data.should.equal('equal')
-				done()
-			})
-			.catch((error) => {
-				done(error)
-			})
+		start().then(() => {
+			compareNumbers(num, MIN, MAX)
+				.then((data) => {
+					data.should.equal('equal')
+				})
+		})
 	})
 })
