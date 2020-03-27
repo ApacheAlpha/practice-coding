@@ -23,12 +23,10 @@ const {
 
 
 routers.get('/api/deletes', (ctx) => {
-	console.log(ctx)
 	del()
 })
 
 routers.get('/register', async (ctx) => {
-	console.log(ctx.body)
 	const { name } = ctx.query
 	const { password } = ctx.query
 	const salt = _.random(0, 100)
@@ -75,12 +73,12 @@ routers.get('/:number', async (ctx) => {
 		const { userid } = ctx.session.user
 		const data = await findnumber(userid)
 		// 输入的number
-		const input = ctx.params.number
+		const number = ctx.params.number
 		// mongodb中的number
 		const monnum = data.number
-		if (monnum > input) {
+		if (monnum > number) {
 			ctx.body = 'big'
-		} else if (monnum < input) {
+		} else if (monnum < number) {
 			ctx.body = 'small'
 			res.send('small')
 		} else {

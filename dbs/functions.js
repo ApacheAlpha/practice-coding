@@ -5,9 +5,9 @@ const url = 'mongodb://localhost:27017'
 function connectDb(callback) {
 	MongoClient.connect(url, (err, db) => {
 		if (err) {
-			console.log('数据库连接失败')
+			callback(err)
 		}
-		callback(db)
+		callback(null,db)
 		db.close()
 	})
 }
