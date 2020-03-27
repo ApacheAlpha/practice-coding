@@ -16,6 +16,7 @@ describe('GET /start', () => {
 	})
 })
 
+
 describe('GET /number', () => {
 	const num = _.random(0, 100)
 	const arrs = ['big', 'small', 'equal']
