@@ -31,7 +31,7 @@ function compareNumbers(data, min, max) {
 }
 
 describe('GET /number', () => {
-	it('should equal ', () => {
+	it('should equal ', (done) => {
 		const MIN = 0
 		const MAX = 100000
 		const num = _.random(0, MAX)
@@ -41,5 +41,6 @@ describe('GET /number', () => {
 					data.should.equal('equal')
 				})
 		})
+		done()
 	})
 })

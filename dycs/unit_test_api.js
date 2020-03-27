@@ -6,16 +6,15 @@ const csz = require('./index')
 const request = requests(csz)
 
 describe('GET /start', () => {
-	it('respond OK', (done) => {
+	it('respond OK', () => {
 		request
 			.get('/start')
 			.end((err, res) => {
 				if (err) {
-					done(err)
+					console.log(err)
 				} else {
 					res.text.should.equal('OK')
 				}
-				done()
 			})
 	})
 })
@@ -24,16 +23,16 @@ describe('GET /start', () => {
 describe('GET /number', () => {
 	const num = _.random(0, 100)
 	const arrs = ['big', 'small', 'equal']
-	it('console.log(big or small or equal)', (done) => {
+	it('big or small or equal', (done) => {
 		request
 			.get(`/${Number(num)}`)
 			.end((err, res) => {
 				if (err) {
-					done(err)
+					console.log(err)
 				} else {
 					arrs.should.containEql(res.text)
 				}
-				done()
 			})
+		done()
 	})
 })
