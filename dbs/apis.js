@@ -80,7 +80,6 @@ routers.get('/:number', async (ctx) => {
 			ctx.body = 'big'
 		} else if (monnum < number) {
 			ctx.body = 'small'
-			res.send('small')
 		} else {
 			ctx.body = 'equal'
 		}
