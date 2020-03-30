@@ -10,8 +10,9 @@ function start(callback) {
 						if (!err && response.statusCode === 200) {
 								callback(null, body)
 						} else {
-								callback(null, '状态码不等于200')
+								callback(new Error('状态码不等于200'))
 						}
+						callback(err)
 				})
 }
 
@@ -32,16 +33,18 @@ function compareNumbers(data, min, max, callback) {
 										callback(null, data)
 								}
 						} else {
-								callback(null, '状态码不等于200')
+								callback(new Error('状态码不等于200'))
 						}
 						callback(err)
 				})
 }
-//
+
 function main(err, data) {
+		if (err) {
+				console.log(err)
+		}
 		return data
 }
-//
 const MIN = 0
 const MAX = 1000000
 const num = _.random(0, MAX)
@@ -49,6 +52,7 @@ const num = _.random(0, MAX)
 start((err) => {
 		if (err) {
 				console.log(err)
+		} else {
+				compareNumbers(num, MIN, MAX, main)
 		}
-		compareNumbers(num, MIN, MAX, main)
 })
