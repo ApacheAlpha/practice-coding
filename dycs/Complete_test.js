@@ -12,11 +12,11 @@ async function compareNumbers(data, min, max) {
 		const body = await req.get(`http://127.0.0.1:3000/${data}`)
 		if (body === 'smaller') {
 				const nums = _.ceil((data + max) / 2)
-				return compareNumbers(nums, data, max)
+				return	await compareNumbers(nums, data, max)
 		}
 		if (body === 'bigger') {
 				const nums = _.ceil((data + min) / 2)
-				return compareNumbers(nums, min, data)
+				return await compareNumbers(nums, min, data)
 		}
 		if (body === 'equal') {
 				return body
