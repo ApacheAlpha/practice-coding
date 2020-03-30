@@ -12,7 +12,6 @@ function start(callback) {
 						} else {
 								callback(new Error('状态码不等于200'))
 						}
-						callback(err)
 				})
 }
 
@@ -35,7 +34,6 @@ function compareNumbers(data, min, max, callback) {
 						} else {
 								callback(new Error('状态码不等于200'))
 						}
-						callback(err)
 				})
 }
 
@@ -43,7 +41,7 @@ function main(err, data) {
 		if (err) {
 				console.log(err)
 		}
-		return data
+		console.log(data)
 }
 const MIN = 0
 const MAX = 1000000
