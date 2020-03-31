@@ -40,8 +40,9 @@ function compareNumbers(data, min, max, callback) {
 function main(err, data) {
 		if (err) {
 				console.log(err)
+		}else {
+				console.log(data)
 		}
-		console.log(data)
 }
 const MIN = 0
 const MAX = 1000000
