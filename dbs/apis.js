@@ -1,5 +1,4 @@
 const Koa = require('koa')
-const math = require('math')
 
 const koans = new Koa()
 const md5 = require('md5')
@@ -7,8 +6,8 @@ const Router = require('koa-router')
 const session = require('koa-session-minimal')
 
 const {
-	insertName, findUser, findId, findNumber, insertNumber,
-} = require('./s2')
+	insertName, findUser, findNumber, insertNumber,
+} = require('./functions')
 
 const routers = new Router()
 const CONFIG = {
@@ -22,10 +21,10 @@ koans.use(session(CONFIG, koans))
 
 routers.get('/register', async (ctx) => {
 	const { name, password } = ctx.query
-	const salt = String(math.ceil(math.random() * 100))
+	const salt = String(Math.random() * 1000000)
 	const md5password = md5(name + salt + password)
 	const results = await findUser(name)
-	if (results.length !== 0) {
+	if (results) {
 		ctx.body = '名字已经存在'
 	} else {
 		insertName(name, salt, md5password)
@@ -36,10 +35,9 @@ routers.get('/register', async (ctx) => {
 routers.get('/login', async (ctx) => {
 	const { name, password } = ctx.query
 	const results = await findUser(name)
-	const { salt } = results[0]
-	const find_id = (await findId(name))[0]
-	const user = { userid: find_id._id }
-	if (results.le !== 0 && md5(name + salt + password) === find_id.password) {
+	const { salt } = results
+	const user = { userid: results._id }
+	if (results && md5(name + salt + password) === results.password) {
 		ctx.session.user = user
 		ctx.body = `Hello ${name}`
 	}
@@ -49,7 +47,7 @@ routers.get('/start', async (ctx) => {
 	// 已经登陆
 	if (ctx.session.user) {
 		const { userid } = ctx.session.user
-		const number = String(math.ceil(math.random() * 100))
+		const number = String(Math.random() * 1000000)
 		insertNumber(String(userid), number)
 		ctx.body = '欢迎来到这里'
 	} else {
@@ -61,7 +59,7 @@ routers.get('/start', async (ctx) => {
 routers.get('/api/:number', async (ctx) => {
 	if (ctx.session.user) {
 		const { userid } = ctx.session.user
-		const data = (await findNumber(userid))[0]
+		const data = await findNumber(userid)
 		// 输入的number
 		const { number } = ctx.params
 		// mongodb中的number
