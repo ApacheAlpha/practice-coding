@@ -5,21 +5,21 @@ const request = require('supertest')(test)
 let header
 let cookie
 let collection
-let db
+let DB
+let client
 
 async function getDb() {
 	const { MongoClient: MongoDB } = require('mongodb')
-	const client = new MongoDB('mongodb://127.0.0.1:27017')
+	client = new MongoDB('mongodb://127.0.0.1:27017')
 	await client.connect()
-	const DB = client.db('test1')
-	return { DB, client }
+	DB = client.db('test1')
 }
 
 describe('GET /register', () => {
 	const arrs = ['数据插入成功', '名字已经存在']
 	before(async () => {
-		db = await getDb()
-		collection = db.DB.collection('user')
+		await getDb()
+		collection = DB.collection('user')
 	})
 	it('数据插入成功 or 名字已经存在 ', (done) => {
 		request
@@ -35,7 +35,7 @@ describe('GET /register', () => {
 	})
 	after(async () => {
 		await	collection.deleteOne({ name: '76' })
-		db.client.close()
+		client.close()
 	})
 })
 
@@ -59,8 +59,8 @@ describe('GET /login', () => {
 describe('GET /start', () => {
 	const arrs = ['欢迎来到这里', '请登陆后再尝试其他操作']
 	before(async () => {
-		db = await getDb()
-		collection = db.DB.collection('number')
+		await getDb()
+		collection = DB.collection('number')
 	})
 	it('start接口测试 ', (done) => {
 		request
@@ -78,7 +78,7 @@ describe('GET /start', () => {
 			const data = await collection.find({}).toArray()
 			const userid = { userid: `${data[data.length - 1].userid}` }
 			await collection.deleteOne(userid)
-			db.client.close()
+			client.close()
 		})
 	})
 })
