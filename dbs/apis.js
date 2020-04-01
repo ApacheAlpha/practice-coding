@@ -49,7 +49,7 @@ routers.get('/start', async (ctx) => {
 		// 已经登陆
 		if (ctx.session.user) {
 				const { userid } = ctx.session.user
-				const number = math.ceil(math.random() * 100)
+				const number = String(math.ceil(math.random() * 100))
 				insertNumber(String(userid), number)
 				ctx.body = '欢迎来到这里'
 		} else {
@@ -61,7 +61,6 @@ routers.get('/start', async (ctx) => {
 routers.get('/api/:number', async (ctx) => {
 		if (ctx.session.user) {
 				const { userid } = ctx.session.user
-				console.log(userid)
 				const data = (await findNumber(userid))[0]
 				// 输入的number
 				const { number } = ctx.params
