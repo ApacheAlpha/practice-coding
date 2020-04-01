@@ -35,7 +35,6 @@ async function findNumber(userid) {
 	await getDb()
 	const collection = await DB.collection('number')
 	const result = await collection.findOne({ userid: `${userid}` })
-	console.log(result)
 	client.close()
 	return result
 }
