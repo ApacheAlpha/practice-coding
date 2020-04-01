@@ -1,5 +1,5 @@
 const should = require('should')
-const test = require('./s1')
+const test = require('./apis')
 const request = require('supertest')(test)
 
 let header
