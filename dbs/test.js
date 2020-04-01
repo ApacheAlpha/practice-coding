@@ -1,19 +1,30 @@
 const should = require('should')
-const test = require('./apis')
+const test = require('./s1')
 const request = require('supertest')(test)
 
 let header
+async function getDb() {
+		const { MongoClient: MongoDB } = require('mongodb')
+		const client = new MongoDB('mongodb://127.0.0.1:27017')
+		await client.connect()
+		const DB = client.db('test1')
+		return { DB, client }
+}
 
 describe('GET /register', () => {
 		const arrs = ['数据插入成功', '名字已经存在']
 		it('数据插入成功 or 名字已经存在 ', (done) => {
 				request
-						.get('/register?name=666666&password=666666')
-						.end((err, res) => {
+						.get('/register?name=76&password=666666')
+						.end(async (err, res) => {
 								if (err) {
 										done(err)
 								} else {
 										arrs.should.containEql(res.text)
+										const db = await getDb()
+										const collection = db.DB.collection('user')
+										await	collection.deleteOne({ name: '76' })
+										db.client.close()
 								}
 								done()
 						})
@@ -23,13 +34,13 @@ describe('GET /register', () => {
 describe('GET /login', () => {
 		it('respond Hello XXX', (done) => {
 				request
-						.get('/login?name=666666&password=f16497d3f65406d636ad8e449221e227')
+						.get('/login?name=6663366&password=666666')
 						.end((err, res) => {
 								if (err) {
 										done(err)
 								} else {
 										header = res.header
-										res.text.should.equal('Hello 666666')
+										res.text.should.equal('Hello 6663366')
 								}
 								done()
 						})
@@ -42,11 +53,17 @@ describe('GET /start', () => {
 				request
 						.get('/start')
 						.set('Cookie', [header['set-cookie'][0].split(';')[0]])
-						.end((err, res) => {
+						.end(async (err, res) => {
 								if (err) {
 										done(err)
 								} else {
 										arrs.should.containEql(res.text)
+										const db = await getDb()
+										const collection = db.DB.collection('number')
+										const data = await collection.find({}).toArray()
+										const userid = { userid: `${data[data.length - 1].userid}` }
+										await collection.deleteOne(userid)
+										db.client.close()
 								}
 								done()
 						})
@@ -67,12 +84,5 @@ describe('GET /number', () => {
 								}
 								done()
 						})
-		})
-})
-
-describe('GET /delete', () => {
-		it('返回 XX条数据被删除 ', () => {
-				request
-						.get('/ssss/deletes')
 		})
 })

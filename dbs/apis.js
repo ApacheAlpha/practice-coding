@@ -1,15 +1,14 @@
 const Koa = require('koa')
+const math = require('math')
 
 const koans = new Koa()
-const _ = require('lodash')
 const md5 = require('md5')
 const Router = require('koa-router')
 const session = require('koa-session-minimal')
 
 const {
-		insername, findall, result, findid, findNumber, del, insernum,
-} = require('./functions')
-
+		insertName, findUser, findId, findNumber, insertNumber,
+} = require('./s2')
 
 const routers = new Router()
 const CONFIG = {
@@ -19,21 +18,30 @@ const CONFIG = {
 		httpOnly: true, /**  true表示只有服务器端可以获取cookie */
 		signed: true, /** 默认 签名 */
 }
-koans.use(session(
-		CONFIG, koans,
-))
+koans.use(session(CONFIG, koans))
 
 routers.get('/register', async (ctx) => {
 		const { name, password } = ctx.query
-		const salt = _.random(0, 100)
+		const salt = String(math.ceil(math.random() * 100))
 		const md5password = md5(name + salt + password)
-		const allname = await findall()
-		const results = await result(allname.arr, name)
-		if (results === false) {
+		const results = await findUser(name)
+		if (results.length !== 0) {
 				ctx.body = '名字已经存在'
 		} else {
-				insername(name, salt, md5password)
+				insertName(name, salt, md5password)
 				ctx.body = '数据插入成功'
+		}
+})
+
+routers.get('/login', async (ctx) => {
+		const { name, password } = ctx.query
+		const results = await findUser(name)
+		const { salt } = results[0]
+		const find_id = (await findId(name))[0]
+		const user = { userid: find_id._id }
+		if (results.le !== 0 && md5(name + salt + password) === find_id.password) {
+				ctx.session.user = user
+				ctx.body = `Hello ${name}`
 		}
 })
 
@@ -41,8 +49,8 @@ routers.get('/start', async (ctx) => {
 		// 已经登陆
 		if (ctx.session.user) {
 				const { userid } = ctx.session.user
-				const number = _.random(0, 100)
-				insernum(userid, number)
+				const number = math.ceil(math.random() * 100)
+				insertNumber(String(userid), number)
 				ctx.body = '欢迎来到这里'
 		} else {
 				// 未登录
@@ -50,26 +58,11 @@ routers.get('/start', async (ctx) => {
 		}
 })
 
-routers.get('/login', async (ctx) => {
-		const { name, password } = ctx.query
-		const findnames = (await findall()).arr
-		const findpasswords = (await findall()).arrs
-		const find_id = await findid(name, password)
-		const user = { userid: find_id._id }
-		if (findnames.includes(name) && findpasswords[findnames.indexOf(name)] === password) {
-				ctx.session.user = user
-				ctx.body = `Hello ${name}`
-		}
-})
-
-routers.get('/ssss/deletes', async () => {
-		del()
-})
-
 routers.get('/api/:number', async (ctx) => {
 		if (ctx.session.user) {
 				const { userid } = ctx.session.user
-				const data = await findNumber(userid)
+				console.log(userid)
+				const data = (await findNumber(userid))[0]
 				// 输入的number
 				const { number } = ctx.params
 				// mongodb中的number

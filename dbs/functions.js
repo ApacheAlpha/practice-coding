@@ -1,150 +1,60 @@
-const { MongoClient } = require('mongodb')
-
-const url = 'mongodb://localhost:27017'
-
-function connectDb(callback) {
-		MongoClient.connect(url, (err, db) => {
-				if (err) {
-						callback(err)
-				} else {
-						callback(null, db)
-				}
-				db.close()
-		})
+async function getDb() {
+		const { MongoClient: MongoDB } = require('mongodb')
+		const client = new MongoDB('mongodb://127.0.0.1:27017')
+		await client.connect()
+		const DB = client.db('test1')
+		return { DB, client }
 }
 
-function insername(name, salt, md5password) {
-		connectDb((err, db) => {
-				if (err) {
-						console.log(err)
-				} else {
-						const DB = db.db('test1')
-						const user = { name, salt, password: md5password }
-						const collection = DB.collection('user')
-						collection.insertOne(user)
-				}
-		})
+async function insertName(name, salt, md5password) {
+		const db = await getDb()
+		const user = { name, salt, password: md5password }
+		const collection = await db.DB.collection('user')
+		await	collection.insertOne(user)
+		db.client.close()
 }
 
-function insernum(userid, number) {
-		connectDb((err, db) => {
-				if (err) {
-						console.log(err)
-				} else {
-						const DB = db.db('test1')
-						const n = { userid, number }
-						const collection = DB.collection('number')
-						collection.insertOne(n)
-				}
-		})
+async function insertNumber(userid, numbers) {
+		const db = await getDb()
+		const n = { userid, numbers }
+		const collection = db.DB.collection('number')
+		const data = await collection.find({ userid }).toArray()
+		if (data.length === 0) {
+				await collection.insertOne(n)
+		} else {
+				await collection.update({ userid: `${userid}` }, { $set: { numbers: `${numbers}` } })
+		}
+		db.client.close()
 }
 
-function findall() {
-		const arr = []
-		const arrs = []
-		return new Promise((resolve, reject) => {
-				connectDb((err, db) => {
-						if (err) {
-								reject(err)
-						} else {
-								const DB = db.db('test1')
-								const collection = DB.collection('user')
-								collection.find({}).toArray((err, result) => { // 返回集合中所有数据
-										if (err) {
-												reject(err)
-										} else {
-												for (let i = 0; i < result.length; i += 1) {
-														arr.push(result[i].name)
-														arrs.push(result[i].password)
-												}
-												resolve({ arr, arrs })
-										}
-								})
-						}
-				})
-		})
+async function findUser(name) {
+		const db = await getDb()
+		const collection = await db.DB.collection('user')
+		const data = await collection.find({ name }).toArray()
+		db.client.close()
+		return data
 }
 
-function findid(name, password) {
-		return new Promise((resolve, reject) => {
-				connectDb((err, db) => {
-						if (err) {
-								reject(err)
-						} else {
-								const DB = db.db('test1')
-								const collection = DB.collection('user')
-								collection.find({ name, password }).toArray((err, result) => { // 返回集合中所有数据
-										if (err) {
-												reject(err)
-										} else {
-												resolve(result[0])
-										}
-								})
-						}
-				})
-		})
+async function findId(name) {
+		const db = await getDb()
+		const collection = await db.DB.collection('user')
+		const result = await collection.find({ name }).toArray()
+		db.client.close()
+		return result
 }
 
-function findNumber(userid) {
-		return new Promise((resolve, reject) => {
-				connectDb((err, db) => {
-						if (err) {
-								reject(err)
-						} else {
-								const DB = db.db('test1')
-								const collection = DB.collection('number')
-								collection.find({ userid }).toArray((err, result) => { // 返回集合中所有数据
-										if (err) {
-												reject(err)
-										} else {
-												resolve(result[result.length - 1])
-										}
-								})
-						}
-				})
-		})
-}
-
-function del() {
-		connectDb((err, db) => {
-				if (err) {
-						console.log(err)
-				} else {
-						const DB = db.db('test1')
-						DB.collection('number').deleteMany({}, (err, obj) => {
-								if (err) {
-										console.log(err)
-								}
-								console.log(`${obj.result.n} 条数据被删除`)
-								db.close()
-						})
-						DB.collection('user').deleteMany({}, (err, obj) => {
-								if (err) {
-										console.log(err)
-								}
-								console.log(`${obj.result.n} 条数据被删除`)
-								db.close()
-						})
-				}
-		})
-}
-
-function result(allname, name) {
-		return new Promise((resolve) => {
-				if (allname.includes(name)) {
-						resolve(false)
-				} else {
-						resolve(true)
-				}
-		})
+async function findNumber(userid) {
+		const db = await getDb()
+		const collection = await db.DB.collection('number')
+		const result = await collection.find({ userid }).toArray()
+		db.client.close()
+		return result
 }
 
 module.exports = {
-		insername,
-		findall,
-		result,
-		findid,
+		insertName,
+		findUser,
+		findId,
 		findNumber,
-		insernum,
-		del,
+		insertNumber,
 }
