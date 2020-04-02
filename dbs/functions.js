@@ -1,47 +1,43 @@
-let DB
+let db
 let client
+let result
 
 async function getDb() {
-	const { MongoClient: MongoDB } = require('mongodb')
-	client = new MongoDB('mongodb://127.0.0.1:27017')
-	await client.connect()
-	DB = client.db('test1')
-}
-
-async function insertName(name, salt, md5password) {
-	await getDb()
-	const user = { name, salt, password: md5password }
-	const collection = await DB.collection('user')
-	await collection.insertOne(user)
-	client.close()
+		const { MongoClient: Mongodb } = require('mongodb')
+		client = new Mongodb('mongodb://127.0.0.1:27017')
+		await client.connect()
+		db = client.db('test1')
+		return { db, client }
 }
 
 async function findUser(name) {
-	await getDb()
-	const collection = await DB.collection('user')
-	const data = await collection.findOne({ name: `${name}` })
-	client.close()
-	return data
+		result = await getDb()
+		const collection = await result.db.collection('user')
+		const data = await collection.findOne({ name })
+		return data
 }
 
-async function insertNumber(userid, numbers) {
-	await getDb()
-	const collection = await DB.collection('number')
-	await collection.update({ userid: `${userid}` }, { $set: { number: `${numbers}` } }, { upsert: true })
-	client.close()
+async function insertName(name, salt, md5password) {
+		const user = { name, salt, password: md5password }
+		const collection = await result.db.collection('user')
+		await	collection.insertOne(user)
+}
+
+async function insertNumber(userid, number) {
+		const collection = await result.db.collection('number')
+		await collection.update({ userid }, { $set: { number: `${number}` } }, { upsert: true })
 }
 
 async function findNumber(userid) {
-	await getDb()
-	const collection = await DB.collection('number')
-	const result = await collection.findOne({ userid: `${userid}` })
-	client.close()
-	return result
+		const collection = await result.db.collection('number')
+		const outcome = await collection.findOne({ userid: `${userid}` })
+		return outcome
 }
 
 module.exports = {
-	insertName,
-	findUser,
-	findNumber,
-	insertNumber,
+		getDb,
+		insertName,
+		findUser,
+		findNumber,
+		insertNumber,
 }
