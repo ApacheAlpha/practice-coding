@@ -75,7 +75,7 @@ describe('GET /register', () => {
 		after(async () => {
 				const data = await collections.find({}).toArray()
 				const userid = { userid: `${data[data.length - 1].userid}` }
-				await	collection.deleteOne({ name: '76556' })
+				await collection.deleteOne({ name: '76556' })
 				await collections.deleteOne(userid)
 		})
 })
