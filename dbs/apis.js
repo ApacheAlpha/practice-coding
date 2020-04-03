@@ -21,7 +21,6 @@ let name
 let password
 
 routers.get('/register', async (ctx) => {
-		console.log('ctx.query', ctx.query)
 		name = ctx.query.name
 		password = ctx.query.password
 		const salt = Math.random() * 1000000
