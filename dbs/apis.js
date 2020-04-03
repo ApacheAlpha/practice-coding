@@ -3,7 +3,7 @@ const md5 = require('md5')
 const Router = require('koa-router')
 const session = require('koa-session-minimal')
 const {
-		insertName, findUser, findNumber, insertNumber,
+		insertName, findUser, findNumber, insertNumber, ensureLogin,
 } = require('./functions')
 
 const koans = new Koa()
@@ -17,8 +17,13 @@ const CONFIG = {
 }
 koans.use(session(CONFIG, koans))
 
+let name
+let password
+
 routers.get('/register', async (ctx) => {
-		const { name, password } = ctx.query
+		console.log('ctx.query', ctx.query)
+		name = ctx.query.name
+		password = ctx.query.password
 		const salt = Math.random() * 1000000
 		const md5password = md5(name + salt + password)
 		const results = await findUser(name)
@@ -30,48 +35,29 @@ routers.get('/register', async (ctx) => {
 		}
 })
 
-routers.get('/login', async (ctx) => {
-		const { name, password } = ctx.query
-		const result = await findUser(name)
-		//	这里只解构salt、 _id，因为ctx.query和results都包含password
-		const { salt, _id } = result
-		if (result && md5(name + salt + password) === result.password) {
-				ctx.session.user = { userid: _id }
-				ctx.body = `Hello ${name}`
-		}
+routers.get('/login', ensureLogin)
+
+routers.get('/start', ensureLogin, async (ctx) => {
+		const { userid } = ctx.session.user
+		// 在ensureLogin转变_id类型，存储的userid就是字符串
+		const number = Math.random() * 1000000
+		await insertNumber(userid, number)
+		ctx.body = '欢迎来到这里'
 })
 
-routers.get('/start', async (ctx) => {
-		// 已经登陆
-		if (ctx.session.user) {
-				const { userid } = ctx.session.user
-				const number = Math.random() * 1000000
-				//	如果这里不强转，插入的userid便是一个object
-				await insertNumber(String(userid), number)
-				ctx.body = '欢迎来到这里'
+routers.get('/api/:number', ensureLogin, async (ctx) => {
+		const { userid } = ctx.session.user
+		const data = await findNumber(userid)
+		// 输入的number
+		const { number } = ctx.params
+		// mongodb中的number
+		const monnum = data.number
+		if (monnum > number) {
+				ctx.body = 'big'
+		} else if (monnum < number) {
+				ctx.body = 'small'
 		} else {
-				// 未登录
-				ctx.body = '请登陆后再尝试其他操作'
-		}
-})
-
-routers.get('/api/:number', async (ctx) => {
-		if (ctx.session.user) {
-				const { userid } = ctx.session.user
-				const data = await findNumber(userid)
-				// 输入的number
-				const { number } = ctx.params
-				// mongodb中的number
-				const monnum = data.number
-				if (monnum > number) {
-						ctx.body = 'big'
-				} else if (monnum < number) {
-						ctx.body = 'small'
-				} else {
-						ctx.body = 'equal'
-				}
-		} else {
-				ctx.body = '请登陆后再尝试其他操作'
+				ctx.body = 'equal'
 		}
 })
 
