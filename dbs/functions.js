@@ -26,7 +26,7 @@ async function insertName(name, salt, md5password) {
 		result = await ensureDB()
 		const user = { name, salt, password: md5password }
 		const collection = await result.db.collection('user')
-		await collection.insertOne(user)
+		await	collection.insertOne(user)
 }
 
 async function insertNumber(userid, number) {
@@ -48,19 +48,11 @@ async function ensureLogin(ctx, next) {
 				return next()
 		}
 		if (url === '/login') {
-				const { name, password } = ctx.query
-				const user = await findUser(name)
-				// 	这里只解构salt、 _id，因为ctx.query和results都包含password
-				const { salt, _id } = user
-				if (user && md5(name + salt + password) === user.password) {
-						//	在这直接把_id转换为string
-						ctx.session.user = { userid: _id.toString() }
-						ctx.body = `Hello ${name}`
-				}
 				return next()
 		}
-		ctx.redirect('http://127.0.0.1:3000/login')
-		return next()
+		next()
+		ctx.status = 401
+		ctx.body = '未经授权'
 }
 
 module.exports = {

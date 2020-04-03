@@ -34,7 +34,18 @@ routers.get('/register', async (ctx) => {
 		}
 })
 
-routers.get('/login', ensureLogin)
+routers.get('/login', ensureLogin, async (ctx) => {
+		name = ctx.query.name
+		password = ctx.query.password
+		const user = await findUser(name)
+		// 	这里只解构salt、 _id，因为ctx.query和results都包含password
+		const { salt, _id } = user
+		if (user && md5(name + salt + password) === user.password) {
+				//	在这直接把_id转换为string
+				ctx.session.user = { userid: _id.toString() }
+				ctx.body = `Hello ${name}`
+		}
+})
 
 routers.get('/start', ensureLogin, async (ctx) => {
 		const { userid } = ctx.session.user
