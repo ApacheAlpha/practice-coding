@@ -26,7 +26,7 @@ async function insertName(name, salt, md5password) {
 		result = await ensureDB()
 		const user = { name, salt, password: md5password }
 		const collection = await result.db.collection('user')
-		await collection.insertOne(user)
+		await	collection.insertOne(user)
 }
 
 async function insertNumber(userid, number) {
@@ -43,14 +43,9 @@ async function findNumber(userid) {
 }
 
 async function ensureLogin(ctx, next) {
-		const url = (ctx.url).split('?')[0]
 		if (ctx.session.user) {
 				return next()
 		}
-		if (url === '/login') {
-				return next()
-		}
-		next()
 		ctx.status = 401
 		ctx.body = '未经授权'
 }

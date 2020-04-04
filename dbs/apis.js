@@ -34,7 +34,7 @@ routers.get('/register', async (ctx) => {
 		}
 })
 
-routers.get('/login', ensureLogin, async (ctx) => {
+routers.get('/login', async (ctx) => {
 		name = ctx.query.name
 		password = ctx.query.password
 		const user = await findUser(name)
