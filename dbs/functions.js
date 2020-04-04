@@ -26,7 +26,7 @@ async function insertName(name, salt, md5password) {
 		result = await ensureDB()
 		const user = { name, salt, password: md5password }
 		const collection = await result.db.collection('user')
-		await	collection.insertOne(user)
+		await collection.insertOne(user)
 }
 
 async function insertNumber(userid, number) {
