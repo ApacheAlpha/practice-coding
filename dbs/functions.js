@@ -4,31 +4,31 @@ async function ensureDB() {
 	const client = new Mongodb('mongodb://127.0.0.1:27017')
 	await client.connect()
 	if (db) {
-		return { db, client }
+		return db
 	}
 	db = client.db('test1')
-	return { db, client }
+	return db
 }
 
-async function findUser(name, dbs) {
-	const collection = await dbs.collection('user')
+async function findUser(name) {
+	const collection = await db.collection('user')
 	const data = await collection.findOne({ name })
 	return data
 }
 
-async function insertName(name, salt, md5password, dbs) {
+async function insertName(name, salt, md5password) {
 	const user = { name, salt, password: md5password }
-	const collection = await dbs.collection('user')
+	const collection = await db.collection('user')
 	await collection.insertOne(user)
 }
 
-async function insertNumber(userid, number, dbs) {
-	const collection = await dbs.collection('number')
+async function insertNumber(userid, number) {
+	const collection = await db.collection('number')
 	await collection.update({ userid }, { $set: { number } }, { upsert: true })
 }
 
-async function findNumber(userid, dbs) {
-	const collection = await dbs.collection('number')
+async function findNumber(userid) {
+	const collection = await db.collection('number')
 	const outcome = await collection.findOne({ userid })
 	return outcome
 }

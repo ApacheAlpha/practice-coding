@@ -1,5 +1,6 @@
 const should = require('should')
 const test = require('./apis')
+const req = require('request')
 const request = require('supertest')(test)
 const {
 	ensureDB,
@@ -11,9 +12,9 @@ let collections
 
 describe('GET /register', () => {
 	before(async () => {
-		const data = await ensureDB()
-		collection = data.db.collection('user')
-		collections = data.db.collection('number')
+		const db = await ensureDB()
+		collection = db.collection('user')
+		collections = db.collection('number')
 	})
 
 	it('数据插入成功 or 名字已经存在 ', (done) => {
@@ -78,12 +79,13 @@ describe('GET /register', () => {
 		request
 			.get('/logout')
 			.set('Cookie', cookie)
-			.set('Session', null)
-			.end((err, res) => {
+			.end((err) => {
 				if (err) {
 					done(err)
 				} else {
-					res.text.should.equal('登出成功')
+					req('http://127.0.0.1:3000/start', (error, response) => {
+						response.statusCode.should.equal(401)
+					})
 				}
 				done()
 			})
