@@ -73,6 +73,21 @@ describe('GET /register', () => {
 				done()
 			})
 	})
+
+	it('返回 登出成功 ', (done) => {
+		request
+			.get('/logout')
+			.set('Cookie', cookie)
+			.set('Session', null)
+			.end((err, res) => {
+				if (err) {
+					done(err)
+				} else {
+					res.text.should.equal('登出成功')
+				}
+				done()
+			})
+	})
 	after(async () => {
 		const data = await collections.find({}).toArray()
 		const userid = { userid: `${data[data.length - 1].userid}` }

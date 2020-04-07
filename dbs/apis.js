@@ -3,7 +3,7 @@ const md5 = require('md5')
 const Router = require('koa-router')
 const session = require('koa-session-minimal')
 const {
-	insertName, findUser, findNumber, insertNumber,
+	insertName, findUser, findNumber, insertNumber, ensureDB
 } = require('./functions')
 
 const koans = new Koa()
@@ -17,7 +17,6 @@ const CONFIG = {
 }
 koans.use(session(CONFIG, koans))
 
-let db
 async function ensureLogin(ctx, next) {
 	if (ctx.session.user) {
 		return next()
@@ -27,9 +26,8 @@ async function ensureLogin(ctx, next) {
 }
 
 async function ensureDBConnection(ctx, next) {
-	const { MongoClient: Mongodb } = require('mongodb')
-	const client = new Mongodb('mongodb://127.0.0.1:27017')
-	await client.connect()
+	// 这里db不再定义为全局，因为只有ensureDBConnection才用到
+	const { db, client } = await ensureDB()
 	if (db) {
 		ctx.Db = db
 		return next()
@@ -56,10 +54,10 @@ routers.get('/login', ensureDBConnection, async (ctx) => {
 	const { name, password } = ctx.query
 	const { Db } = ctx
 	const user = await findUser(name, Db)
-	//	这里只解构salt、 _id，因为ctx.query和results都包含password
+	// 这里只解构salt、_id，因为ctx.query和results都包含password
 	const { salt, _id } = user
 	if (user && md5(name + salt + password) === user.password) {
-	//	在这直接把_id转换为string
+		// 在这直接把_id转换为string
 		ctx.session.user = { userid: _id.toString() }
 		ctx.body = `Hello ${name}`
 	}
@@ -68,7 +66,7 @@ routers.get('/login', ensureDBConnection, async (ctx) => {
 routers.get('/start', ensureLogin, ensureDBConnection, async (ctx) => {
 	const { userid } = ctx.session.user
 	const { Db } = ctx
-	//	在ensureLogin转变_id类型，存储的userid就是字符串
+	// 在ensureLogin转变_id类型，存储的userid就是字符串
 	const number = Math.random() * 1000000
 	await insertNumber(userid, number, Db)
 	ctx.body = '欢迎来到这里'
@@ -78,9 +76,9 @@ routers.get('/api/:number', ensureLogin, ensureDBConnection, async (ctx) => {
 	const { userid } = ctx.session.user
 	const { Db } = ctx
 	const data = await findNumber(userid, Db)
-	//	输入的number
+	// 输入的number
 	const { number } = ctx.params
-	//	mongodb中的number
+	// mongodb中的number
 	const monnum = data.number
 	if (monnum > number) {
 		ctx.body = 'big'
@@ -89,6 +87,12 @@ routers.get('/api/:number', ensureLogin, ensureDBConnection, async (ctx) => {
 	} else {
 		ctx.body = 'equal'
 	}
+})
+
+routers.get('/logout', ensureLogin, async (ctx) => {
+	// 清空 session 中用户信息
+	ctx.session.user = null
+	ctx.body = '登出成功'
 })
 
 koans.use(routers.routes())

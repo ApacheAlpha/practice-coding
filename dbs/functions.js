@@ -10,7 +10,6 @@ async function ensureDB() {
 	return { db, client }
 }
 
-
 async function findUser(name, dbs) {
 	const collection = await dbs.collection('user')
 	const data = await collection.findOne({ name })
