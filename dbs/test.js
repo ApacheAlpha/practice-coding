@@ -6,17 +6,8 @@ const {
 	ensureDB,
 } = require('./functions')
 
-let cookie
-let collection
-let collections
-
 describe('GET /register', () => {
-	before(async () => {
-		const db = await ensureDB()
-		collection = db.collection('user')
-		collections = db.collection('number')
-	})
-
+	let cookie
 	it('数据插入成功 or 名字已经存在 ', (done) => {
 		const arr = ['数据插入成功', '名字已经存在']
 		request
@@ -91,9 +82,12 @@ describe('GET /register', () => {
 			})
 	})
 	after(async () => {
-		const data = await collections.find({}).toArray()
+		const db = await ensureDB()
+		const collectionUser = db.collection('user')
+		const collectionNumber = db.collection('number')
+		const data = await collectionNumber.find({}).toArray()
 		const userid = { userid: `${data[data.length - 1].userid}` }
-		await collection.deleteOne({ name: '76556' })
-		await collections.deleteOne(userid)
+		await collectionUser.deleteOne({ name: '76556' })
+		await collectionNumber.deleteOne(userid)
 	})
 })
