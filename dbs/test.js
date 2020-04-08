@@ -85,9 +85,9 @@ describe('GET /register', () => {
 		const db = await ensureDB()
 		const collectionUser = db.collection('user')
 		const collectionNumber = db.collection('number')
-		const data = await collectionNumber.find({}).toArray()
-		const userid = { userid: `${data[data.length - 1].userid}` }
+		const data = await collectionUser.findOne({ name: '76556' })
+		console.log(data)
+		await collectionNumber.deleteOne({ userid: `${data._id}` })
 		await collectionUser.deleteOne({ name: '76556' })
-		await collectionNumber.deleteOne(userid)
 	})
 })
